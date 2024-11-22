@@ -122,7 +122,6 @@ public class FieldCentricDrive {
         } else {
             x = leftX;
             y = leftY;
-            hello
         }
         
         double turn;

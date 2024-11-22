@@ -46,7 +46,7 @@ public class SlideV2 extends SubsystemBase {
         rightSlide = new MotorEx(hardwareMap, "rightSlide");
 
         rightSlide.setInverted(true);
-        leftSlide.setInverted(true);
+        leftSlide.setInverted(false);
 
         leftSlide.resetEncoder();
         rightSlide.resetEncoder();

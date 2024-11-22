@@ -16,7 +16,7 @@ public class Arm extends SubsystemBase {
     public static double resetPose = 0.5,
                                 grabPose = 0.25;
     Telemetry telemetry;
-    private final ServoEx leftArm, rightArm;
+    private final SimpleServo leftArm, rightArm;
 
     public Arm(final HardwareMap hMap, Telemetry telemetry) {
         this.leftArm = new SimpleServo(hMap, "leftArm", 0, 360);

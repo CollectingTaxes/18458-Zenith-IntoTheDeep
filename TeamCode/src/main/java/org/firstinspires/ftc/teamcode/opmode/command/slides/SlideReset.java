@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystem.CommandBased.SlideV2;
 public class SlideReset extends SequentialCommandGroup {
     public SlideReset (SlideV2 slideV2, Claw claw, Arm arm) {
                 addCommands(
-                        new InstantCommand(arm::score),
+                        new InstantCommand(arm::reset),
                         new InstantCommand(claw::Reset),
                         new InstantCommand(slideV2::liftRest)
                 );
