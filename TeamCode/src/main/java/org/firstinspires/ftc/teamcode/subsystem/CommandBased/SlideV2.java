@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
@@ -15,108 +17,71 @@ public class SlideV2 extends SubsystemBase {
     private final MotorEx leftSlide;
     private final MotorEx rightSlide;
 
-    //Prob gonna have to mess with these values
-    //Use https://www.ctrlaltftc.com/the-pid-controller
-    public static PIDFCoefficients pidfUpCoefficients = new PIDFCoefficients(0.005, 0.00, 0,0);
+    public static int min = -5;
+    public static int max = 2500;
 
-    private PIDFController upController;
-    private boolean slideAutomatic;
-
-    public static double CPR = 384.5; //Counts Per Revolution (435 RPM)
-
-    public double upSpeed = 1;
-    public double downSpeed= -1;
-
-    //Make sure to test positions with manual
-    public static int restingPose = 0;
-    public static int lowPose = 100;
-    public static int midPose = 200;
-    public static int highPose = 300;
-    double output = 0;
-
-    public enum LiftPos{
-        REST,
-        LOW, MID, HIGH,
-    }
-    LiftPos liftPos;
+    public static int High = 2200;
+    public static int Mid = 600;
+    public static int Low = 100;
+    public static int Reset = 0;
+    public int current = 0;
 
     public SlideV2 ( HardwareMap hardwareMap,Telemetry telemetry) {
 
         leftSlide = new MotorEx(hardwareMap, "leftSlide");
         rightSlide = new MotorEx(hardwareMap, "rightSlide");
 
-        rightSlide.setInverted(true);
-        leftSlide.setInverted(false);
+        rightSlide.setInverted(false);
+        leftSlide.setInverted(true);
 
         leftSlide.resetEncoder();
         rightSlide.resetEncoder();
 
-        leftSlide.setDistancePerPulse(360 / CPR);
-        rightSlide.setDistancePerPulse(360 / CPR);
-
-        upController = new PIDFController(pidfUpCoefficients.p, pidfUpCoefficients.i, pidfUpCoefficients.d, pidfUpCoefficients.f, getAngle(), getAngle());
-        upController.setTolerance(10);
+        leftSlide.motorEx.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightSlide.motorEx.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.telemetry = telemetry;
-        slideAutomatic = false;
-        liftPos = liftPos.REST;
     }
 
     @Override
     public void periodic() {
-        if (slideAutomatic) {
+        if(!rightSlide.motorEx.isBusy()){
+            leftSlide.motorEx.setPower(0);
+            rightSlide.motorEx.setPower(0);
 
-            upController.setF(pidfUpCoefficients.f * Math.cos(Math.toRadians(upController.getSetPoint())));
-
-            output = upController.calculate(getAngle());
-
-            leftSlide.set(output);
-            rightSlide.set(-output);
-
+            telemetry.addData("     left encoder: ", getPos());
+            telemetry.addData("     right encoder: ", getPos());
         }
-        telemetry.addLine( "Slide Pose");
-        telemetry.addData("Lift Motor Output", output);
-        telemetry.addData("     Lift Left Power", leftSlide.getVelocity());
-        telemetry.addData("     Lift Right Power:", rightSlide.getVelocity());
-
-        telemetry.addData("     Left Encoder: ", leftSlide.getCurrentPosition());
-        telemetry.addData("     Right Encoder: ", rightSlide.getCurrentPosition());
-        telemetry.addData("     List Pos:", liftPos);
     }
 
-    public void upSlideManual(){
-        slideAutomatic = false;
-        leftSlide.set(upSpeed);
-        rightSlide.set(-upSpeed);
+    public void setPos(int pos) {
+        if (pos <= max && pos >= min) current = pos;
+        System.out.println(current);
+        normalize();
     }
 
-    public void downSlideManual() {
-        slideAutomatic = false;
-        leftSlide.set(downSpeed);
-        rightSlide.set(-downSpeed);
+    public int getPos() {
+        return current;
     }
 
-    public void setPower(double power) {
-        leftSlide.set(power);
-        rightSlide.set(power);
+    public void moveManual(double position) {
+        setPos((int) position);
     }
 
-    public void stopSlide() {
-        leftSlide.stopMotor();
-        upController.setSetPoint(getAngle());
-        rightSlide.stopMotor();
-        slideAutomatic = false;
-    }
-
-    public double getAngle() {
-        return leftSlide.getDistance();
+    public void normalize() {
+        leftSlide.motorEx.setTargetPosition(current);
+        leftSlide.motorEx.setTargetPositionTolerance(10);
+        leftSlide.motorEx.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        leftSlide.motorEx.setPower(1);
+        rightSlide.motorEx.setTargetPosition(current);
+        rightSlide.motorEx.setTargetPositionTolerance(10);
+        rightSlide.motorEx.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        rightSlide.motorEx.setPower(1);
     }
 
     //Lift Pose
     public void liftRest() {
-        slideAutomatic = true;
-        upController.setSetPoint(restingPose);
-        liftPos = liftPos.REST;
+        setPos(Reset);
     }
 
     public void encoderRecenter() {
@@ -126,34 +91,15 @@ public class SlideV2 extends SubsystemBase {
     }
 
     public void liftLow() {
-        slideAutomatic = true;
-        upController.setSetPoint(lowPose);
-        liftPos = liftPos.LOW;
+        setPos(Low);
     }
 
     public void liftMid() {
-        slideAutomatic = true;
-        upController.setSetPoint(midPose);
-        liftPos = liftPos.MID;
+        setPos(Mid);
     }
 
     public void liftHigh() {
-        slideAutomatic = true;
-        upController.setSetPoint(highPose);
-        liftPos = liftPos.HIGH;
-    }
-
-    public void liftAuto() {
-        slideAutomatic = true;
-        upController.setSetPoint(1400);
-        liftPos = liftPos.HIGH;
-    }
-
-    public void setPosition(double position) {
-        upController.setSetPoint(position);
-    }
-    public double getPosition() {
-        return upController.getSetPoint();
+        setPos(High);
     }
 
 }
