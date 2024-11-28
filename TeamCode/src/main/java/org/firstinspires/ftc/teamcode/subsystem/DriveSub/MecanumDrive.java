@@ -113,9 +113,9 @@ public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive
         }
 
         //Motor Direction
-        leftFront.setDirection(FORWARD);
+        leftFront.setDirection(REVERSE);
         leftRear.setDirection(REVERSE);
-        rightFront.setDirection(REVERSE);
+        rightFront.setDirection(FORWARD);
         rightRear.setDirection(FORWARD);
 
         List<Integer> lastTrackingEncPositions = new ArrayList<>();

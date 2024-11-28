@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystem.CommandBased;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -18,7 +20,11 @@ public class SlideV2 extends SubsystemBase {
     public static int min = -5;
     public static int max = 2500;
 
+<<<<<<< HEAD
     public static int High = 1000;
+=======
+    public static int High = 2200;
+>>>>>>> parent of c62d4ea (Merge remote-tracking branch 'origin/main')
     public static int Mid = 600;
     public static int Low = 100;
     public static int Reset = 0;
@@ -29,8 +35,8 @@ public class SlideV2 extends SubsystemBase {
         leftSlide = new MotorEx(hardwareMap, "leftSlide");
         rightSlide = new MotorEx(hardwareMap, "rightSlide");
 
-        rightSlide.setInverted(true);
-        leftSlide.setInverted(false );
+        rightSlide.setInverted(false);
+        leftSlide.setInverted(true);
 
         leftSlide.resetEncoder();
         rightSlide.resetEncoder();
@@ -43,12 +49,13 @@ public class SlideV2 extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(!rightSlide.motorEx.isBusy() && !leftSlide.motorEx.isBusy()){
+        if(!rightSlide.motorEx.isBusy()){
             leftSlide.motorEx.setPower(0);
             rightSlide.motorEx.setPower(0);
+
+            telemetry.addData("     left encoder: ", getPos());
+            telemetry.addData("     right encoder: ", getPos());
         }
-        telemetry.addData("     left encoder: ", getPos());
-        telemetry.addData("     right encoder: ", getPos());
     }
 
     public void setPos(int pos) {

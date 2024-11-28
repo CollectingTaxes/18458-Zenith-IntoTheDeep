@@ -13,8 +13,13 @@ public class Arm extends SubsystemBase {
 
     public static boolean REVERSED = false;
 
+<<<<<<< HEAD
     public static double resetPose = 0.8,
                                 grabPose = 0.43;
+=======
+    public static double resetPose = 0.5,
+                                grabPose = 0.25;
+>>>>>>> parent of c62d4ea (Merge remote-tracking branch 'origin/main')
     Telemetry telemetry;
     private final SimpleServo leftArm, rightArm;
 
