@@ -18,7 +18,7 @@ public class SlideV2 extends SubsystemBase {
     public static int min = -5;
     public static int max = 2500;
 
-    public static int High = 1100;
+    public static int High = 1000;
     public static int Mid = 600;
     public static int Low = 100;
     public static int Reset = 0;

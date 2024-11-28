@@ -29,7 +29,7 @@ public class Claw extends SubsystemBase {
 
         Claw.setInverted(false);
 
-        Claw.setPosition(resetPose);
+        Claw.setPosition(scorePose);
 
         this.telemetry = telemetry;
     }
